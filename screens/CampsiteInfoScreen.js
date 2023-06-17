@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FlatList, StyleSheet, Text, View, Button, Modal } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { Rating, Input } from 'react-native-elements';
 import RenderCampsite from '../features/campsites/RenderCampsite';
 import { toggleFavorite } from '../features/favorites/favoritesSlice';
 
@@ -18,13 +19,38 @@ const CampsiteInfoScreen = ({ route }) => {
         return (
             <View style={styles.commentItem}>
                 <Text style={{ fontSize: 14 }}>{item.text}</Text>
-                <Text style={{ fontSize: 12 }}>{item.rating} Stars</Text>
+                <Rating
+                    readonly 
+                    startingValue={item.rating}
+                    imageSize={10}
+                    style={{
+                        alignItems: 'flex-start',
+                        paddingVertical: '5%'
+                    }}
+                />
                 <Text style={{ fontSize: 12 }}>
                     {`-- ${item.author}, ${item.date}`}
                 </Text>
             </View>
         );
     };
+
+    const handleSubmit = () => {
+        const newComment = {
+            author,
+            rating,
+            text,
+            campsiteId: campsite.id
+        };
+        console.log(newComment)
+        setShowModal(!showModal)
+    }
+
+    const resetForm = () => {
+        setAuthor('');
+        setRating(5);
+        setText('')
+    }
 
     return (
         <>
@@ -57,9 +83,41 @@ const CampsiteInfoScreen = ({ route }) => {
                 onRequestClose={() => setShowModal(!showModal)}
             >
                 <View style={styles.modal}>
+                    <Rating 
+                        showRating
+                        startingValue={rating}
+                        imageSize={40}
+                        onFinishRating={(rating)=> setRating(rating)}
+                        style={{paddingVertical: 10}}
+                    />
+                    <Input
+                        placeholder='Author'
+                        leftIcon={{ type: 'font-awesome', name: 'user-o' }}
+                        leftIconContainerStyle={{paddingRight: 10}}
+                        onChangeText={(author) => setAuthor(author)}
+                        value={author}
+                    />
+                    <Input
+                        placeholder='Comment'
+                        leftIcon={{ type: 'font-awesome', name: 'comment-o' }}
+                        leftIconContainerStyle={{ paddingRight: 10 }}
+                        onChangeText={(text) => setText(text)}
+                        value={text}
+                    />
+                    <View style={{margin: 10}}>
+                        <Button 
+                            onPress={() => {
+                                handleSubmit();
+                                resetForm();
+                            }}
+                            title='submit'
+                            color='#5637DD'
+                        />
+                    </View>
                     <View style={{margin: 10}}>
                         <Button
                             onPress={() => {
+                                resetForm();
                                 setShowModal(!showModal);
                             }}
                             color='#808080'
